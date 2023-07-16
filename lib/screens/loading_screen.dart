@@ -1,5 +1,6 @@
+import 'package:clima/location.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -9,42 +10,38 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  Location location = Location();
+  @override
+  void initState() async {
+    // TODO: implement initState
+    super.initState();
+    Location location = Location();
+    await location.determinePosition();
+  }
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  void getWeatherData() async {
+    // String url = "https://api.openweathermap.org/data/2.5/weather?lat="+location.latitude+"&lon="location.longitude"&appid=dba68107515a4901722d3c3cd51fb5bb";
 
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
+    http.Response response = await http.get(Uri.parse(
+        'https://api.openweathermap.org/data/2.5/weather?lat=44.34&lon=10.99&appid=dba68107515a4901722d3c3cd51fb5bb'));
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
-      }
+    if (response.statusCode == 200) {
+      String data = response.body;
+      print(data);
+    } else {
+      print(response.statusCode);
     }
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium);
-    print(position);
-    return position;
   }
 
   @override
   Widget build(BuildContext context) {
+    getWeatherData();
     return Scaffold(
       body: Center(
         child: ElevatedButton(
           child: Text('Get Location'),
           onPressed: () {
-            _determinePosition();
+            // _determinePosition();
           },
         ),
       ),
