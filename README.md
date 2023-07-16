@@ -2,7 +2,11 @@
 
 A new Flutter project.
 
-## Getting Started
+![plot](images/screen1.png)
+
+![plot](images/screen3.png)
+
+![plot](images/screen2.png)
 
 This project is a starting point for a Flutter application.
 
